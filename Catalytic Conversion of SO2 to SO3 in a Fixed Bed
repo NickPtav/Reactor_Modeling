@@ -1,0 +1,100 @@
+import numpy as np
+from scipy.integrate import odeint
+import matplotlib.pyplot as plt
+
+def reactor(y, z):
+    global my, Dp, epsr, rho0, R, rho_c, U, T_out, R0, Ac, nt0, T0, P0, v0, P1_0, P2_0, P3_0, ny
+
+    P, T, v, P1, P2, P3 = y
+
+    k = 9.8692e-3 * np.exp(-97782 / T - (110.1 * np.log(T)) + 848.1)
+    Kp = 0.00314 * np.exp(98325 / (R * T) - 11.24)
+    r = k * np.sqrt(P1 / P3) * (P2 - (P3 / (Kp * P1)) ** 2)
+    Cp1 = 30.178 + 42.452e-3 * T - 18.218e-6 * T ** 2
+    Cp2 = 23.995 + 17.507e-3 * T - 6.628e-6 * T ** 2
+    Cp3 = 35.634 + 71.722e-3 * T - 31.539e-6 * T ** 2
+    Cp4 = 26.159 + 6.615e-3 * T - 2.889e-7 * T ** 2
+    Hr = -98787 - 6.5415 * (T - 700) + 0.02057 * (T ** 2 - 700 ** 2) / 2 - 10.011e-6 * (T ** 3 - 700 ** 3) / 3
+
+    Re_p = rho0 * v0 * Dp / my
+    f = (1 - epsr) / epsr ** 3 * (1.75 + 4.2 * Re_p ** (5 / 6) * (1 - epsr) / Re_p)
+    dPdz = -f * rho0 * v0 * Dp * v
+    dTdz = -R * T / v * (r * rho_c * Hr + 2 / R0 * U * (T - T_out)) / (
+            P1 * Cp1 + P2 * Cp2 + P3 * Cp3 + (P - P1 - P2 - P3) * Cp4)
+
+    dvdz = R * T / P * (-1 / 2 * rho_c * r) + v / T * dTdz - v / P * dPdz
+    dP1dz = P1 / T * dTdz - P1 / v * dvdz + R * T / v * ny[0] * rho_c * r
+    dP2dz = P2 / T * dTdz - P2 / v * dvdz + R * T / v * ny[1] * rho_c * r
+    dP3dz = P3 / T * dTdz - P3 / v * dvdz + R * T / v * ny[2] * rho_c * r
+
+    dydz = [dPdz, dTdz, dvdz, dP1dz, dP2dz, dP3dz]
+    return dydz
+
+my = 3.7204e-5
+Dp = 4.572e-3
+epsr = 0.45
+rho0 = 0.8649
+R = 8.3144
+rho_c = 541.42
+U = 56.783
+T_out = 702.6
+R0 = 0.0353
+Ac = np.pi * R0 ** 2
+nt0 = 0.2149 / Ac
+T0 = 777.78
+P0 = 202650.0
+v0 = nt0 * R * T0 / P0
+P1_0 = P0 * 0.11
+P2_0 = P0 * 0.1
+P3_0 = 1e-10
+ny = [-1, -0.5, 1]
+
+z0 = 0
+zF = 6
+zspan = [z0, zF]
+
+reac0 = [P0, T0, v0, P1_0, P2_0, P3_0]
+
+z = np.linspace(z0, zF, 100)  # Adjust the number of points as needed
+y = odeint(reactor, reac0, z)
+
+P = y[:, 0]
+T = y[:, 1]
+v = y[:, 2]
+P1 = y[:, 3]
+P2 = y[:, 4]
+P3 = y[:, 5]
+
+n1 = P1 * v / (R * T)
+n2 = P2 * v / (R * T)
+n3 = P3 * v / (R * T)
+n4 = (P - P1 - P2 - P3) * v / (R * T)
+
+X = (nt0 * P1_0 / P0 - (n1 + n2 + n3 + n4) * P1 / P) / (nt0 * P1_0 / P0)
+
+plt.figure(1)
+plt.plot(z, P1, 'k', z, P2, '--k', z, P3, ':k', linewidth=2)
+plt.xlabel('z (m)')
+plt.ylabel('P_i (Pa)')
+plt.legend(['P_1', 'P_2', 'P_3'])
+plt.grid()
+
+plt.figure(2)
+plt.plot(z, P, 'k', linewidth=2)
+plt.xlabel('z (m)')
+plt.ylabel('P (Pa)')
+plt.grid()
+
+plt.figure(3)
+plt.plot(z, T, 'k', linewidth=2)
+plt.xlabel('z (m)')
+plt.ylabel('T (K)')
+plt.grid()
+
+plt.figure(4)
+plt.plot(z, X, 'k', linewidth=2)
+plt.xlabel('z (m)')
+plt.ylabel('X (-)')
+plt.grid()
+
+plt.show()
