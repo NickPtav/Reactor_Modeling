@@ -7,13 +7,22 @@ def reactor(y, z):
 
     P, T, v, P1, P2, P3 = y
 
+    #Constante de velocidade de reação
     k = 9.8692e-3 * np.exp(-97782 / T - (110.1 * np.log(T)) + 848.1)
+
+    #Constante de equilíbrio
     Kp = 0.00314 * np.exp(98325 / (R * T) - 11.24)
+   
+    #Lei da velocidade de reação
     r = k * np.sqrt(P1 / P3) * (P2 - (P3 / (Kp * P1)) ** 2)
+
+    #Capacidade calorífica [J/(mol . K)]
     Cp1 = 30.178 + 42.452e-3 * T - 18.218e-6 * T ** 2
     Cp2 = 23.995 + 17.507e-3 * T - 6.628e-6 * T ** 2
     Cp3 = 35.634 + 71.722e-3 * T - 31.539e-6 * T ** 2
     Cp4 = 26.159 + 6.615e-3 * T - 2.889e-7 * T ** 2
+
+    #Calor de reação
     Hr = -98787 - 6.5415 * (T - 700) + 0.02057 * (T ** 2 - 700 ** 2) / 2 - 10.011e-6 * (T ** 3 - 700 ** 3) / 3
 
     Re_p = rho0 * v0 * Dp / my
@@ -34,16 +43,16 @@ my = 3.7204e-5          # [kg/(m.s)]
 Dp = 4.572e-3           # [m]
 epsr = 0.45             # []
 rho0 = 0.8649           # [km/m^3]  
-R = 8.3144              # []
+R = 8.3144              # [m^3 . Pa/K . mol]
 rho_c = 541.42          # [kg/m^3]
 U = 56.783              # [J/(m^2 . s .K)]
 T_out = 702.6           # [K]
 R0 = 0.0353             # [m]
 Ac = np.pi * R0 ** 2    # [m^2]
-nt0 = 0.2149 / Ac       # 
+nt0 = 0.2149 / Ac       # [mol/ m^2 .s]
 T0 = 777.78             # [K]
 P0 = 202650.0           # [Pa]
-v0 = nt0 * R * T0 / P0  # [m^3]
+v0 = nt0 * R * T0 / P0  # [m/s]
 P1_0 = P0 * 0.11        # [Pa]
 P2_0 = P0 * 0.1         # [Pa]
 P3_0 = 1e-10            # [Pa]
