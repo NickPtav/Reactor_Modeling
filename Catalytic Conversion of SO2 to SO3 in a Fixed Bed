@@ -30,25 +30,26 @@ def reactor(y, z):
     dydz = [dPdz, dTdz, dvdz, dP1dz, dP2dz, dP3dz]
     return dydz
 
-my = 3.7204e-5
-Dp = 4.572e-3
-epsr = 0.45
-rho0 = 0.8649
-R = 8.3144
-rho_c = 541.42
-U = 56.783
-T_out = 702.6
-R0 = 0.0353
-Ac = np.pi * R0 ** 2
-nt0 = 0.2149 / Ac
-T0 = 777.78
-P0 = 202650.0
-v0 = nt0 * R * T0 / P0
-P1_0 = P0 * 0.11
-P2_0 = P0 * 0.1
-P3_0 = 1e-10
-ny = [-1, -0.5, 1]
+my = 3.7204e-5          # [kg/(m.s)]
+Dp = 4.572e-3           # [m]
+epsr = 0.45             # []
+rho0 = 0.8649           # [km/m^3]  
+R = 8.3144              # []
+rho_c = 541.42          # [kg/m^3]
+U = 56.783              # [J/(m^2 . s .K)]
+T_out = 702.6           # [K]
+R0 = 0.0353             # [m]
+Ac = np.pi * R0 ** 2    # [m^2]
+nt0 = 0.2149 / Ac       # 
+T0 = 777.78             # [K]
+P0 = 202650.0           # [Pa]
+v0 = nt0 * R * T0 / P0  # [m^3]
+P1_0 = P0 * 0.11        # [Pa]
+P2_0 = P0 * 0.1         # [Pa]
+P3_0 = 1e-10            # [Pa]
+ny = [-1, -0.5, 1]      
 
+# Limite de integração
 z0 = 0
 zF = 6
 zspan = [z0, zF]
